@@ -1799,10 +1799,13 @@ let GuildFights = {
 			} else {
 				let actives=[]
 				for (x of m) if (GuildFights.otherGuilds.members[x.name] < x.won_battles) {
-					actives.push(x.name)
+					actives.push({name: x.name, battles: x.won_battles - GuildFights.otherGuilds.members[x.name]})
 					GuildFights.otherGuilds.members[x.name] = x.won_battles
 				}
-				if (Object.values(actives).length>0) GuildFights.otherGuilds.show(data.responseData.name,actives)
+				if (Object.values(actives).length>0) {
+					actives.sort((a, b) => (a.battles - b.battles) * -1)
+					GuildFights.otherGuilds.show(data.responseData.name,actives)
+				}
 			}
 			GuildFights.otherGuilds.last=time
 		},
@@ -1818,9 +1821,9 @@ let GuildFights = {
 					'dragdrop': true
 				});
 			}
-			let body=`<h2 style="text-align:center">${guildName}</h2><ul>`;
-			for (let x of list) body += `<li>${x}</li>`
-			body +=`<ul>`;
+			let body=`<h2 style="text-align:center">${guildName}</h2>${list.length} active players within ${GuildFights.otherGuilds.last.fromNow(true)}<table class="foe-table">`;
+			for (let player of list) body += `<tr><td>${player.name}</td><td>${player.battles}</td></tr>`
+			body +=`</table>`;
 			$('#OtherGuildActivityBody').html(body);
 		}
 	}
